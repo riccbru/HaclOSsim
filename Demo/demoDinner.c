@@ -5,7 +5,7 @@
 
 #define NUM_PHILOSOPHERS 5
 
-// Semaphores for forks
+// Array of binary semaphores for forks
 SemaphoreHandle_t forks[NUM_PHILOSOPHERS];
 
 void philosopherTask(void *param) {
@@ -13,7 +13,8 @@ void philosopherTask(void *param) {
     int leftFork = id;
     int rightFork = (id + 1) % NUM_PHILOSOPHERS;
 
-    // Apply asymmetry: even philosophers pick up left fork first, odd pick up right first
+    // Even philosophers pick up left fork first, odd pick up right first
+    // 
     int firstFork = (id % 2 == 0) ? leftFork : rightFork;
     int secondFork = (id % 2 == 0) ? rightFork : leftFork;
 

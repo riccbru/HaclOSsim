@@ -3,8 +3,6 @@
 #include "task.h"
 #include "semphr.h"
 
-// cd Desktop/PoliTO/CAOS/proj/PolitoCAOSProject/Examples/build/gcc
-
 /* Ingredient types */
 #define TOBACCO  0
 #define PAPER    1
