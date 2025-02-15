@@ -69,7 +69,7 @@ qemu-system-arm -s -S -M mps2-an385 -cpu cortex-m3 -monitor none -nographic -ser
 N.B. Omit the "-s -S" options if you only want to run the FreeRTOS application in QEMU without attaching a debugger.
 - Inside another terminal start the debugger with the command:
 ```bash
- arm-none-eabi-gdb [path-to]/RTOSDemo.out -ex "target remote :1234"
+ arm-none-eabi-gdb /path/to/RTOSDemo.out -ex "target remote :1234"
 ```
 - Finally, type the command `continue` to start the kernel:
 ```bash
