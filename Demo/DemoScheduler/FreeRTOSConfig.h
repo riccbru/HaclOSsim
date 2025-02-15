@@ -44,7 +44,7 @@
 
 #define configUSE_TICKLESS_IDLE         0
 #define configUSE_PREEMPTION			1
-#define configUSE_APERIODIC_PREEMPTION	1
+#define configUSE_APERIODIC_PREEMPTION	0
 #define configUSE_IDLE_HOOK				0
 #define configUSE_TICK_HOOK				1
 #define configCPU_CLOCK_HZ				( ( unsigned long ) 25000000 )
@@ -60,7 +60,7 @@
 #define configUSE_MALLOC_FAILED_HOOK	1
 #define configUSE_QUEUE_SETS			1
 #define configUSE_COUNTING_SEMAPHORES	1
-#define configUSE_POLLING_SERVER	    0
+#define configUSE_POLLING_SERVER	    1
 
 #define configMAX_PRIORITIES			( 9UL )
 #define configQUEUE_REGISTRY_SIZE		10

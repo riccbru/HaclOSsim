@@ -14,8 +14,8 @@
 typedef struct {
     int id;         // Customer ID
     int arrivalTime;
-    int serviceTime;
-    int hairLength; // Hair length affecting service time
+    int expirationTime; // Time after which the customer leaves if not served
+    int serviceTime; // Hair cut duration
 } CustomerData_t;
 
 QueueHandle_t xWaitingRoomQueue;
@@ -25,7 +25,7 @@ int servedCustomers = 0, lostCustomers = 0;
 
 CustomerData_t customers[NUM_CUSTOMERS] = {
     {1, 1, 10, 2},
-    {2, 3, 8, 4},
+    {2, 3, 8, 5},
     {3, 5, 12, 1},
     {4, 1, 7, 1},
     {5, 4, 15, 2},
@@ -35,24 +35,29 @@ void vBarberTask(void *pvParameters) {
     CustomerData_t customer;
     for (;;) {
         if (xQueueReceive(xWaitingRoomQueue, &customer, portMAX_DELAY) == pdTRUE) {
-            TickType_t startTime = xTaskGetTickCount();
-            printf("[Barber] Serving Customer %d at time %d ms\n", customer.id, startTime * portTICK_PERIOD_MS);
-            xSemaphoreTake(xBarberChair, portMAX_DELAY);
+            TickType_t xStartTime = xTaskGetTickCount();
+            TickType_t xEndTime = customer.serviceTime * configTICK_RATE_HZ;
+
+            printf("[Barber] starting haircut on customer %d at %d\n", customer.id, xStartTime);
             
-            // Calculate the delay based on service time and hair length
-            TickType_t serviceDuration = pdMS_TO_TICKS(customer.serviceTime * customer.hairLength);
-            TickType_t currentTick = xTaskGetTickCount();
-            while (currentTick < serviceDuration + startTime) {
-                currentTick = xTaskGetTickCount();
+            TickType_t xCurrentTick = xTaskGetTickCount();
+            while (xCurrentTick < xEndTime + xStartTime) {
+                if (customer.expirationTime * configTICK_RATE_HZ <= xCurrentTick) {
+                    printf("[Barber] didn't finish haircut for customer %d\n", customer.id);
+                    lostCustomers++;
+                    break;
+                }
+                xCurrentTick = xTaskGetTickCount();
             }
-            
-            TickType_t endTime = xTaskGetTickCount();
-            printf("[Barber] Finished Customer %d at time %d ms\n", customer.id, endTime * portTICK_PERIOD_MS);
+            if (xCurrentTick >= xEndTime + xStartTime) {
+                printf("[Barber] finished haircut for customer %d\n", customer.id);
+                servedCustomers++;
+            }
             xSemaphoreGive(xBarberChair);
-            servedCustomers++;
         }
     }
 }
+
 
 void vCustomerTask(void *pvParameters) {
     CustomerData_t *customer = (CustomerData_t *)pvParameters;
@@ -78,7 +83,7 @@ void vCustomerGeneratorTask(void *pvParameters) {
     // Sort customers by service time (Shortest Job First)
     for (int i = 0; i < NUM_CUSTOMERS - 1; i++) {
         for (int j = i + 1; j < NUM_CUSTOMERS; j++) {
-            if (customers[i].serviceTime > customers[j].serviceTime) {
+            if (customers[i].arrivalTime > customers[j].arrivalTime) {
                 CustomerData_t temp = customers[i];
                 customers[i] = customers[j];
                 customers[j] = temp;
