@@ -61,9 +61,10 @@
 #define DEMO_MAIN_BLINKY 1
 #define DEMO_SMOKERS	 2
 #define DEMO_DINNER	     3
+#define DEMO_BARBER	     4
 
 /* mainSELECT_DEMO is used to select each demo, based on the value indicated above. */
-#define mainSELECT_DEMO DEMO_DINNER
+#define mainSELECT_DEMO DEMO_BARBER
 
 /* printf() output uses the UART.  These constants define the addresses of the
 required UART registers. */
@@ -84,6 +85,7 @@ extern void main_blinky( void );
 extern void main_full( void );
 extern void demoSmokers( void );
 extern void demoDiningPhilosophers( void );
+extern void demoBarber( void );
 
 /*
  * Only the comprehensive demo uses application hook (callback) functions.  See
@@ -124,6 +126,10 @@ void main( void )
 	#elif ( mainSELECT_DEMO == DEMO_DINNER )
     {
 		demoDiningPhilosophers();
+    }
+	#elif ( mainSELECT_DEMO == DEMO_BARBER )
+    {
+		demoBarber();
     }
     #else
     {
