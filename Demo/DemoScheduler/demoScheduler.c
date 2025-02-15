@@ -80,6 +80,7 @@ void vCustomerGeneratorCallback(TimerHandle_t xTimer) {
 }
 
 void vCustomerGeneratorTask(void *pvParameters) {
+    ( void ) pvParameters;
     // Sort customers by service time (Shortest Job First)
     for (int i = 0; i < NUM_CUSTOMERS - 1; i++) {
         for (int j = i + 1; j < NUM_CUSTOMERS; j++) {
