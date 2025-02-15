@@ -64,7 +64,7 @@
 #define DEMO_BARBER	     4
 
 /* mainSELECT_DEMO is used to select each demo, based on the value indicated above. */
-#define mainSELECT_DEMO DEMO_SMOKERS
+#define mainSELECT_DEMO DEMO_DINNER
 
 /* printf() output uses the UART.  These constants define the addresses of the
 required UART registers. */
@@ -84,7 +84,7 @@ required UART registers. */
 extern void main_blinky( void );
 extern void main_full( void );
 extern void demoSmokers( void );
-extern void demoDiningPhilosophers( void );
+extern void demoDinner( void );
 extern void demoBarber( void );
 
 /*
@@ -125,7 +125,7 @@ void main( void )
     }
 	#elif ( mainSELECT_DEMO == DEMO_DINNER )
     {
-		demoDiningPhilosophers();
+		demoDinner();
     }
 	#elif ( mainSELECT_DEMO == DEMO_BARBER )
     {

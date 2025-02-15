@@ -17,10 +17,6 @@ void philosopherTask(void *param) {
     int firstFork = (id % 2 == 0) ? leftFork : rightFork;
     int secondFork = (id % 2 == 0) ? rightFork : leftFork;
 
-    // 92 red
-    // 92 green
-    // 93 yellow
-
     while (1) {
         printf("\033[1;90m[~]\033[0m  Philosopher %d is \033[1;90mthinking\033[0m\n", id);
         vTaskDelay(pdMS_TO_TICKS(1000));
@@ -44,7 +40,7 @@ void philosopherTask(void *param) {
     }
 }
 
-void demoDiningPhilosophers() {
+void demoDinner() {
     // Initialize semaphores for forks
     for (int i = 0; i < NUM_PHILOSOPHERS; i++) {
         forks[i] = xSemaphoreCreateBinary();
