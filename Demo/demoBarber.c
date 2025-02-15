@@ -70,7 +70,7 @@ void vBarberTask( void *pvParameters )
 
         } else {
             // This should not happen if using portMAX_DELAY
-            printf("Barber: Error receiving customer from waiting room!\n");
+            printf("\033[93m[!]\033[0m\t\033[41mError receiving customers in waiting room queue\033[0m\n");
         }
     }
 }
@@ -95,7 +95,6 @@ void vCustomerTask( void *pvParameters )
         }
     } else {
         // No free chairs, customer leaves
-        // printf("\033[95m[ Customer ]\033[0m\tCustomer %d: No free chairs. Leaving the shop.\n", customerID);
         printf("\033[95m[ Customer %d ]\033[0m\tLeaves: \033[91mwaiting room is full\033[0m\n", customerID);
     }
 
@@ -119,7 +118,7 @@ void vCustomerGeneratorTask(void *pvParameters) {
                         NULL );                   /* Used to pass out the created task's handle. */
 
         if (xReturned != pdPASS) {
-            printf("Error creating customer %d task\n", i);
+            printf("\033[93m[!]\033[0m\t\033[41mError creating customer %d task\033[0m\n", i);
         }
         // Space out customer arrival delay
         vTaskDelay(pdMS_TO_TICKS(CUSTOMER_ARRIVAL_DELAY_MS)); 
@@ -162,7 +161,7 @@ int demoBarber( void )
             NULL );                       /* Used to pass out the created task's handle. */
 
         if (xReturned != pdPASS) {
-            printf("\033[93m[!]\033[0m\t\033[41mError creating Barber %d task\033[0m\n", i);
+            printf("\033[93m[!]\033[0m\t\033[41mError creating barber %d task\033[0m\n", i);
             return 1;
         }
     }
