@@ -30,18 +30,18 @@ void taskAgent(void *pvParameter) {
     while (1) {
         int choice = custom_rand() % 3;  // Randomly select which two ingredients to place
 
-        printf("Agent places ");
+        printf("\033[1;92m[+]\033[0m  Agent places ");
         switch (choice) {
             case TOBACCO:
-                printf("PAPER & MATCHES\n");
+                printf("\033[92mPAPER\033[0m & \033[92mMATCHES\033[0m\n");
                 xSemaphoreGive(xSemaphoreTobaccoSmoker);  // Tobacco smoker is missing, notify them
                 break;
             case PAPER:
-                printf("TOBACCO & MATCHES\n");
+                printf("\033[92mTOBACCO\033[0m & \033[92mMATCHES\033[0m\n");
                 xSemaphoreGive(xSemaphorePaperSmoker);    // Paper smoker is missing
                 break;
             case MATCHES:
-                printf("TOBACCO & PAPER\n");
+                printf("\033[92mTOBACCO\033[0m & \033[92mPAPER\033[0m\n");
                 xSemaphoreGive(xSemaphoreMatchesSmoker);  // Matches smoker is missing
                 break;
         }
@@ -70,17 +70,18 @@ void taskSmoker(void *pvParameter) {
                 break;
         }
 
-        printf("Smoker with ");
+        printf("\033[1;90m[~]\033[0m  Smoker with ");
         switch (smokerType) {
             case TOBACCO: printf("TOBACCO "); break;
             case PAPER: printf("PAPER "); break;
             case MATCHES: printf("MATCHES "); break;
         }
-        printf("rolls a cigarette and smokes\n");
+        printf("\033[1;90msmokes\033[0m\n");
+        printf("\033[1;90m[~]\033[0m\t\t\033[1;90m. . .\033[0m\n");
 
         vTaskDelay(pdMS_TO_TICKS(2000));  // Simulate smoking time
 
-        printf("Smoker finished smoking\n");
+        printf("\033[1;92m[*]\033[0m  Smoker \033[92mfinished\033[0m smoking\n\n");
 
         // Notify the agent that smoking is done
         xSemaphoreGive(xSemaphoreSmokerDone);

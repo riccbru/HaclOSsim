@@ -19,8 +19,8 @@ This demo uses FreeRTOS queues to synchronize the barber and customers.
 #include "semphr.h"
 
 /* Constants */
-#define MAX_CUSTOMERS       5   // Max customers that can wait in the waiting room
-#define NUM_CUSTOMERS_TOTAL 10  // Total number of customers arriving at the shop
+#define MAX_CUSTOMERS       23   // Max customers that can wait in the waiting room
+#define NUM_CUSTOMERS_TOTAL 50  // Total number of customers arriving at the shop
 #define HAIR_CUT_DURATION_MS 2000 // Time for a haircut (milliseconds)
 #define CUSTOMER_ARRIVAL_DELAY_MS 500 //Delay between customer arrivals
 
@@ -42,24 +42,22 @@ void vBarberTask( void *pvParameters )
 
     ( void ) pvParameters; // Suppress unused parameter warning
 
-    printf( "Barber: Shop is open!\n" );
-
     for ( ;; ) {
         // Wait for a customer to enter the waiting room
         xStatus = xQueueReceive(xWaitingRoomQueue, &customerID, portMAX_DELAY);
 
         if (xStatus == pdPASS) {
             // Customer found in the waiting room
-            printf("Barber: Waking up. Customer %d is here.\n", customerID);
+            printf("\033[95m[  Barber  ]\033[0m\t\033[90mWaking up: customer %d is waiting\033[0m\n", customerID);
 
             // Take the barber chair (wait until it's available)
             xSemaphoreTake(xBarberChair, portMAX_DELAY);
-            printf("Barber: Cutting hair for Customer %d\n", customerID);
+            printf("\033[95m[  Barber  ]\033[0m\t\033[90mCutting customer %d's hair\033[0m\n", customerID);
 
             // Simulate haircut duration
             vTaskDelay(pdMS_TO_TICKS(HAIR_CUT_DURATION_MS));
 
-            printf("Barber: Finished haircut for Customer %d\n", customerID);
+            printf("\033[95m[  Barber  ]\033[0m\t\033[92mFinished haircut for customer %d\033[0m\n", customerID);
 
             // Release the barber chair
             xSemaphoreGive(xBarberChair);
@@ -78,20 +76,21 @@ void vCustomerTask( void *pvParameters )
     int customerID = (int)pvParameters;
     BaseType_t xStatus;
 
-    printf("Customer %d: Arrived at the barber shop.\n", customerID);
+    printf("\033[95m[ Customer ]\033[0m\tCustomer %d \033[92marrived\033[0m at the barber shop\n", customerID);
 
     // Check if there's a free chair in the waiting room
     if (uxQueueMessagesWaiting(xWaitingRoomQueue) < MAX_CUSTOMERS) {
         // Enter the waiting room
-        printf("Customer %d: Entering the waiting room.\n", customerID);
+        printf("\033[95m[ Customer ]\033[0m\tCustomer %d entering the \033[93mwaiting room\033[0m\n", customerID);
         xStatus = xQueueSendToBack(xWaitingRoomQueue, &customerID, 0); // Non-blocking send
 
         if (xStatus != pdPASS) {
-            printf("Customer %d: Waiting room is full, leaving.\n", customerID);
+            printf("\033[95m[ Customer ]\033[0m\tCustomer %d is leaving: \033[91mwaiting room is full\033[0m\n", customerID);
         }
     } else {
         // No free chairs, customer leaves
-        printf("Customer %d: No free chairs. Leaving the shop.\n", customerID);
+        // printf("\033[95m[ Customer ]\033[0m\tCustomer %d: No free chairs. Leaving the shop.\n", customerID);
+        printf("\033[95m[ Customer ]\033[0m\tCustomer %d is leaving: \033[91mwaiting room is full\033[0m\n", customerID);
     }
 
     vTaskDelete(NULL); // Customer task is done after arriving.
@@ -150,9 +149,9 @@ int demoBarber( void )
                     NULL );             /* Used to pass out the created task's handle. */
 
     if (xReturned == pdPASS) {
-        printf("Barber task created successfully\n");
+        printf("\t\t\033[1;95mBARBER SHOP OPEN\033[0m\n");
     } else {
-        printf("Error creating barber task\n");
+        printf("\033[93m[!]\033[0m\t\033[41mError creating barber task\033[0m\n");
         return 1;
     }
 
@@ -167,9 +166,9 @@ int demoBarber( void )
                     NULL );             /* Used to pass out the created task's handle. */
 
     if (xReturned == pdPASS) {
-        printf("Customer Generator task created successfully\n");
+        printf("\t\033[95mCustomers are coming\033[0m\n\n");
     } else {
-        printf("Error creating Customer Generator task\n");
+        printf("\033[93m[!]\033[0m\t\033[41mError creating Customer Generator task\033[0m\n");
         return 1;
     }
 
