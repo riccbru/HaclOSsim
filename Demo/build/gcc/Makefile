@@ -36,7 +36,7 @@ SOURCE_FILES += $(KERNEL_DIR)/portable/GCC/ARM_CM3/port.c
 # Common demo files for the "full" build, as opposed to the "blinky" build - 
 # these files are build by all the FreeRTOS kernel demos.
 #
-DEMO_ROOT = $(FREERTOS_ROOT)/Examples
+DEMO_ROOT = $(FREERTOS_ROOT)/Demo
 COMMON_DEMO_FILES = $(DEMO_ROOT)/Common/Minimal
 INCLUDE_DIRS += -I$(DEMO_ROOT)/Common/include
 VPATH += $(COMMON_DEMO_FILES)
@@ -78,13 +78,8 @@ INCLUDE_DIRS += -I$(DEMO_PROJECT) -I$(DEMO_PROJECT)/CMSIS
 SOURCE_FILES += $(DEMO_PROJECT)/main.c
 SOURCE_FILES += $(DEMO_PROJECT)/main_blinky.c
 SOURCE_FILES += $(DEMO_PROJECT)/main_full.c
-SOURCE_FILES += $(DEMO_PROJECT)/demoTimer.c
-SOURCE_FILES += $(DEMO_PROJECT)/demoSemaphores.c
-SOURCE_FILES += $(DEMO_PROJECT)/demoStats.c
-SOURCE_FILES += $(DEMO_PROJECT)/demoMatrix.c
-SOURCE_FILES += $(DEMO_PROJECT)/demoHospital.c
-SOURCE_FILES += $(DEMO_PROJECT)/demoHospital2.c
 SOURCE_FILES += $(DEMO_PROJECT)/demoSmokers.c
+SOURCE_FILES += $(DEMO_PROJECT)/demoDiningPhilosophers.c
 SOURCE_FILES += ./startup_gcc.c
 # Lightweight print formatting to use in place of the heavier GCC equivalent.
 SOURCE_FILES += ./printf-stdarg.c

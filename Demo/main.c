@@ -59,16 +59,11 @@
 
 #define DEMO_MAIN_FULL   0
 #define DEMO_MAIN_BLINKY 1
-#define DEMO_TIMER       2
-#define DEMO_SEMAPHORES	 3
-#define DEMO_STATS	     4
-#define DEMO_MATRIX	     5
-#define DEMO_HOSPITAL	 6
-#define DEMO_HOSPITAL2	 7
-#define DEMO_SMOKERS	 8
+#define DEMO_SMOKERS	 2
+#define DEMO_DINNER	     3
 
 /* mainSELECT_DEMO is used to select each demo, based on the value indicated above. */
-#define mainSELECT_DEMO DEMO_SMOKERS
+#define mainSELECT_DEMO DEMO_DINNER
 
 /* printf() output uses the UART.  These constants define the addresses of the
 required UART registers. */
@@ -91,13 +86,8 @@ required UART registers. */
  */
 extern void main_blinky( void );
 extern void main_full( void );
-extern void demoTimer( void );
-extern void demoSemaphores( void );
-extern void demoStats( void );
-extern void demoMatrix( void );
-extern void demoHospital( void );
-extern void demoHospital2( void );
 extern void demoSmokers( void );
+extern void demoDiningPhilosophers( void );
 
 /*
  * Only the comprehensive demo uses application hook (callback) functions.  See
@@ -131,33 +121,13 @@ void main( void )
     {
 		main_full();
 	}
-	#elif ( mainSELECT_DEMO == DEMO_TIMER )
-	{
-		demoTimer();
-    }
-    #elif ( mainSELECT_DEMO == DEMO_SEMAPHORES )
-    {
-		demoSemaphores();
-    }
-    #elif ( mainSELECT_DEMO == DEMO_STATS )
-    {
-		demoStats();
-    }
-    #elif ( mainSELECT_DEMO == DEMO_MATRIX )
-    {
-		demoMatrix();
-	}
-    #elif ( mainSELECT_DEMO == DEMO_HOSPITAL )
-    {
-		demoHospital();
-    }
-    #elif ( mainSELECT_DEMO == DEMO_HOSPITAL2 )
-    {
-		demoHospital2();
-    }
     #elif ( mainSELECT_DEMO == DEMO_SMOKERS )
     {
 		demoSmokers();
+    }
+	#elif ( mainSELECT_DEMO == DEMO_DINNER )
+    {
+		demoDiningPhilosophers();
     }
     #else
     {

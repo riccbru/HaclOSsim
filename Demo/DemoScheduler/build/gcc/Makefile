@@ -36,7 +36,7 @@ SOURCE_FILES += $(KERNEL_DIR)/portable/GCC/ARM_CM3/port.c
 # Common demo files for the "full" build, as opposed to the "blinky" build - 
 # these files are build by all the FreeRTOS kernel demos.
 #
-DEMO_ROOT = $(FREERTOS_ROOT)/Examples
+DEMO_ROOT = $(FREERTOS_ROOT)/Demo
 COMMON_DEMO_FILES = $(DEMO_ROOT)/Common/Minimal
 INCLUDE_DIRS += -I$(DEMO_ROOT)/Common/include
 VPATH += $(COMMON_DEMO_FILES)
