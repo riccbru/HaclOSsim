@@ -36,7 +36,7 @@ void philosopherTask(void *param) {
         xSemaphoreGive(forks[firstFork]);
         xSemaphoreGive(forks[secondFork]);
 
-        printf("\033[1;92m[*]\033[0m  Philosopher %d \033[92mfinished eating\033[0m\n", id);
+        printf("\033[1;92m[*]\033[0m  Philosopher %d \033[92mfinished eating\033[0m\n\n", id);
     }
 }
 

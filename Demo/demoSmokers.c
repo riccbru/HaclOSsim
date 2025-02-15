@@ -77,7 +77,7 @@ void taskSmoker(void *pvParameter) {
             case MATCHES: printf("MATCHES "); break;
         }
         printf("\033[1;90msmokes\033[0m\n");
-        printf("\033[1;90m[~]\033[0m\t\t\033[1;90m. . .\033[0m\n");
+        printf("\033[1;90m[~]\033[0m\t    \033[1;90m. . .\033[0m\n");
 
         vTaskDelay(pdMS_TO_TICKS(2000));  // Simulate smoking time
 

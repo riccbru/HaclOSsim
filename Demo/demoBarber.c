@@ -48,11 +48,11 @@ void vBarberTask( void *pvParameters )
 
         if (xStatus == pdPASS) {
             // Customer found in the waiting room
-            printf("\033[95m[  Barber  ]\033[0m\t\033[90mWaking up: customer %d is waiting\033[0m\n", customerID);
+            printf("\033[95m[  Barber  ]\033[0m\t\033[1;90mWakes up\033[0m\n", customerID);
 
             // Take the barber chair (wait until it's available)
             xSemaphoreTake(xBarberChair, portMAX_DELAY);
-            printf("\033[95m[  Barber  ]\033[0m\t\033[90mCutting customer %d's hair\033[0m\n", customerID);
+            printf("\033[95m[  Barber  ]\033[0m\t\033[93mCutting\033[0m customer %d's hair\n", customerID);
 
             // Simulate haircut duration
             vTaskDelay(pdMS_TO_TICKS(HAIR_CUT_DURATION_MS));
@@ -61,6 +61,8 @@ void vBarberTask( void *pvParameters )
 
             // Release the barber chair
             xSemaphoreGive(xBarberChair);
+
+            printf("\033[95m[  Barber  ]\033[0m\t\033[1;90mGoes to sleep\033[0m\n\n");
 
         } else {
             // This should not happen if using portMAX_DELAY
