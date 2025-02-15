@@ -63,23 +63,13 @@ cd FreeRTOS/FreeRTOS/Demo/CORTEX_MPS2_QEMU_IAR_GCC/build/gcc
 - A file named `RTOSDemo.out` should have been generated in the `output` folder.
 - Now QEMU can be run with the command:
 ```bash
-qemu-system-arm -machine mps2-an385 -cpu cortex-m3 -kernel /path/to/RTOSDemo.out -monitor none -nographic -serial stdio -s -S
+qemu-system-arm -s -S -M mps2-an385 -cpu cortex-m3 -monitor none -nographic -serial stdio -kernel /path/to/RTOSDemo.out
 ```
-or (suitable for MacOS too):
-```bash
-sudo qemu-system-arm -M mps2-an385 -cpu cortex-m3 -nographic -kernel /path/to/RTOSDemo.out -s -S
-```
-
-Where `[path-to]` is the path to the `RTOSDemo.out` file previously generated.
 
 N.B. Omit the "-s -S" options if you only want to run the FreeRTOS application in QEMU without attaching a debugger.
 - Inside another terminal start the debugger with the command:
 ```bash
-arm-none-eabi-gdb [path-to]/RTOSDemo.out
-```
-- Then connect to the target TCP port 1234:
-```bash
-(gdb) target remote :1234
+ arm-none-eabi-gdb [path-to]/RTOSDemo.out -ex "target remote :1234"
 ```
 - Finally, type the command `continue` to start the kernel:
 ```bash

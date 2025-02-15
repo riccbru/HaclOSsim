@@ -51,7 +51,7 @@ void demoDiningPhilosophers() {
     for (int i = 0; i < NUM_PHILOSOPHERS; i++) {
         static int philosopherId[NUM_PHILOSOPHERS];
         philosopherId[i] = i;
-        xTaskCreate(philosopherTask, "Philosopher", configMINIMAL_STACK_SIZE, &philosopherId[i], 1, NULL);
+        xTaskCreate(philosopherTask, "Philosopher", configMINIMAL_STACK_SIZE * 4, &philosopherId[i], 1, NULL);
     }
 
     // Start scheduler

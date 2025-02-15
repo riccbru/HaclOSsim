@@ -77,12 +77,8 @@ required UART registers. */
 /*
  * main_blinky() is used when mainSELECT_DEMO is set to DEMO_MAIN_BLINKY.
  * main_full() is used when mainSELECT_DEMO is set to DEMO_MAIN_FULL.
- * demoTimer() is used when mainSELECT_DEMO is set to DEMO_TIMER.
- * demoSemaphores() is used when mainSELECT_DEMO is set to DEMO_SEMAPHORES.
- * demoStats() is used when mainSELECT_DEMO is set to DEMO_STATS.
- * demoMatrix() is used when mainSELECT_DEMO is set to DEMO_MATRIX.
- * demoHospital() is used when mainSELECT_DEMO is set to DEMO_HOSPITAL.
- * demoHospital2() is used when mainSELECT_DEMO is set to DEMO_HOSPITAL2.
+ * demoSmokers() is used when mainSELECT_DEMO is set to DEMO_SMOKERS.
+ * demoDiningPhilosopher() is used when mainSELECT_DEMO is set to DEMO_DINNER.
  */
 extern void main_blinky( void );
 extern void main_full( void );
