@@ -77,11 +77,29 @@ N.B. Omit the "-s -S" options if you only want to run the FreeRTOS application i
 ```
 You should now see the output displayed in the terminal where QEMU is running.
 #### From Visual Studio Code
-- Find the `gdb-arm-none-eabi` executable path using
+- Find the `qemu-system-arm`, `arm-none-eabi-gcc`, `make`, `cmake` executable paths using:
 ```bash
-which arm-none-eabi-gdb
+which qemu-system-arm arm-none-eabi-gcc make cmake
 ```
+- Add the QEMU, Arm GNU Compiler, CMake, and 'make' installation paths to your PATH environment variable.
+- In VSCode, select 'File > Open Folder' in the menu and select this subfolder: '[path-to]/FreeRTOS/FreeRTOS/Demo/CORTEX_MPS2_QEMU_IAR_GCC'
 - Open VSCode, find `.vscode/launch.json` and add JSON entry:
 ```json
-"miDebuggerPath": "/path/to/gdb-arm-none-eabi"
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch QEMU RTOSDemo",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/gcc/output/RTOSDemo.out",
+            "cwd": "${workspaceFolder}",
+            "miDebuggerPath": "/Applications/ARM/bin/arm-none-eabi-gdb-py",
+            "miDebuggerServerAddress": "localhost:1234",
+            "stopAtEntry": true,
+            "preLaunchTask": "Run QEMU"
+        }
+    ]
+}
 ```
+- Press the 'Run and Debug' button from the left side panel in VSCode. Select 'Launch QEMU RTOSDemo' from the dropdown at the top and press the 'play' button.
