@@ -19,14 +19,14 @@ This demo uses FreeRTOS queues to synchronize the barber and customers.
 #include "semphr.h"
 
 /* Constants */
-#define MAX_CUSTOMERS       23   // Max customers that can wait in the waiting room
-#define NUM_CUSTOMERS_TOTAL 50  // Total number of customers arriving at the shop
-#define HAIR_CUT_DURATION_MS 2000 // Time for a haircut (milliseconds)
-#define CUSTOMER_ARRIVAL_DELAY_MS 500 //Delay between customer arrivals
+#define MAX_CUSTOMERS               23      // Max customers that can wait in the waiting room
+#define NUM_CUSTOMERS_TOTAL         50      // Total number of customers arriving at the shop
+#define HAIR_CUT_DURATION_MS        2000    // Time for a haircut (milliseconds)
+#define CUSTOMER_ARRIVAL_DELAY_MS   500     //Delay between customer arrivals
 
 /* Queue and Semaphore Handles (Shared Objects) */
-QueueHandle_t xWaitingRoomQueue;  // Queue for customers waiting in the waiting room
-SemaphoreHandle_t xBarberChair;    // Binary semaphore representing the barber chair (available/unavailable)
+QueueHandle_t xWaitingRoomQueue;    // Queue for customers waiting in the waiting room
+SemaphoreHandle_t xBarberChair;     // Binary semaphore representing the barber chair (available/unavailable)
 
 /* Function Prototypes */
 void vBarberTask( void *pvParameters );
@@ -40,7 +40,8 @@ void vBarberTask( void *pvParameters )
     int customerID;
     BaseType_t xStatus;
 
-    ( void ) pvParameters; // Suppress unused parameter warning
+    // Suppress warning: Unused Parameter
+    ( void ) pvParameters;
 
     for ( ;; ) {
         // Wait for a customer to enter the waiting room
@@ -84,7 +85,7 @@ void vCustomerTask( void *pvParameters )
     if (uxQueueMessagesWaiting(xWaitingRoomQueue) < MAX_CUSTOMERS) {
         // Enter the waiting room
         printf("\033[95m[ Customer ]\033[0m\tCustomer %d entering the \033[93mwaiting room\033[0m\n", customerID);
-        xStatus = xQueueSendToBack(xWaitingRoomQueue, &customerID, 0); // Non-blocking send
+        xStatus = xQueueSendToBack(xWaitingRoomQueue, &customerID, 0);
 
         if (xStatus != pdPASS) {
             printf("\033[95m[ Customer ]\033[0m\tCustomer %d is leaving: \033[91mwaiting room is full\033[0m\n", customerID);
@@ -107,21 +108,21 @@ void vCustomerGeneratorTask(void *pvParameters) {
 
     for (i = 1; i <= NUM_CUSTOMERS_TOTAL; i++) {
         xReturned = xTaskCreate(
-                        vCustomerTask,      /* Function that implements the task. */
-                        "Customer",          /* Text name for the task. */
-                        configMINIMAL_STACK_SIZE,  /* Stack size in words, not bytes. */
-                        (void *)i,          /* Parameter passed into the task. */
-                        tskIDLE_PRIORITY + 1, /* Priority at which the task is created. */
-                        NULL );            /* Used to pass out the created task's handle. */
+                        vCustomerTask,            /* Function that implements the task. */
+                        "Customer",               /* Text name for the task. */
+                        configMINIMAL_STACK_SIZE, /* Stack size in words, not bytes. */
+                        (void *)i,                /* Parameter passed into the task. */
+                        tskIDLE_PRIORITY + 1,     /* Priority at which the task is created. */
+                        NULL );                   /* Used to pass out the created task's handle. */
 
         if (xReturned != pdPASS) {
             printf("Error creating customer %d task\n", i);
         }
-        vTaskDelay(pdMS_TO_TICKS(CUSTOMER_ARRIVAL_DELAY_MS));  // Space out customer arrival times.
+        // Space out customer arrival times.
+        vTaskDelay(pdMS_TO_TICKS(CUSTOMER_ARRIVAL_DELAY_MS)); 
     }
     vTaskDelete(NULL); //Generator finished.
 }
-
 
 /*-----------------------------------------------------------*/
 
@@ -138,17 +139,17 @@ int demoBarber( void )
         return 1;
     }
 
-    /* Give the barber chair semaphore, indicating it's initially available. */
+    /* Give the barber chair semaphore, indicating it's available. */
     xSemaphoreGive(xBarberChair);
 
     /* Create the barber task. */
     xReturned = xTaskCreate(
-                    vBarberTask,       /* Function that implements the task. */
-                    "Barber",           /* Text name for the task. */
-                    configMINIMAL_STACK_SIZE,   /* Stack size in words, not bytes. */
-                    NULL,               /* Parameter passed into the task. */
-                    tskIDLE_PRIORITY + 2,/* Priority at which the task is created. */
-                    NULL );             /* Used to pass out the created task's handle. */
+                    vBarberTask,                  /* Function that implements the task. */
+                    "Barber",                     /* Text name for the task. */
+                    configMINIMAL_STACK_SIZE,     /* Stack size in words, not bytes. */
+                    NULL,                         /* Parameter passed into the task. */
+                    tskIDLE_PRIORITY + 2,         /* Priority at which the task is created. */
+                    NULL );                       /* Used to pass out the created task's handle. */
 
     if (xReturned == pdPASS) {
         printf("\t\t\033[1;95mBARBER SHOP OPEN\033[0m\n");
@@ -161,11 +162,11 @@ int demoBarber( void )
     /* Create the customer generator task. */
     xReturned = xTaskCreate(
                     vCustomerGeneratorTask,       /* Function that generates customer tasks. */
-                    "CustomerGenerator",           /* Text name for the task. */
-                    configMINIMAL_STACK_SIZE,   /* Stack size in words, not bytes. */
-                    NULL,               /* Parameter passed into the task. */
-                    tskIDLE_PRIORITY + 1,/* Priority at which the task is created. */
-                    NULL );             /* Used to pass out the created task's handle. */
+                    "CustomerGenerator",          /* Text name for the task. */
+                    configMINIMAL_STACK_SIZE,     /* Stack size in words, not bytes. */
+                    NULL,                         /* Parameter passed into the task. */
+                    tskIDLE_PRIORITY + 1,         /* Priority at which the task is created. */
+                    NULL );                       /* Used to pass out the created task's handle. */
 
     if (xReturned == pdPASS) {
         printf("\t\033[95mCustomers are coming\033[0m\n\n");
