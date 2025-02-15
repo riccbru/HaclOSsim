@@ -20,8 +20,8 @@ This demo uses FreeRTOS queues to synchronize the barber and customers.
 
 /* Constants */
 #define NUM_BARBERS                   2           //  Number of barbers
-#define MAX_CUSTOMERS                 23          //  Max customers that can wait in the waiting room
-#define NUM_CUSTOMERS_TOTAL           50          //  Total number of customers arriving at the shop
+#define NUM_SEATS                     25          //  Max customers that can wait in the waiting room
+#define NUM_CUSTOMERS                 50          //  Total number of customers arriving at the shop
 #define HAIR_CUT_DURATION_MS          2000        //  Time for a haircut (milliseconds)
 #define CUSTOMER_ARRIVAL_DELAY_MS     500         //  Delay between customer arrivals
 
@@ -85,7 +85,7 @@ void vCustomerTask( void *pvParameters )
     printf("\033[95m[ Customer %d ]\033[0m\t\033[92mArrived\033[0m at the barber shop\n", customerID);
 
     // Check if there's a free chair in the waiting room
-    if (uxQueueMessagesWaiting(xWaitingRoomQueue) < MAX_CUSTOMERS) {
+    if (uxQueueMessagesWaiting(xWaitingRoomQueue) < NUM_SEATS) {
         // Enter the waiting room
         printf("\033[95m[ Customer %d ]\033[0m\tEntering the \033[93mwaiting room\033[0m\n", customerID);
         xStatus = xQueueSendToBack(xWaitingRoomQueue, &customerID, 0);
@@ -109,7 +109,7 @@ void vCustomerGeneratorTask(void *pvParameters) {
     BaseType_t xReturned;
     int i;
 
-    for (i = 1; i <= NUM_CUSTOMERS_TOTAL; i++) {
+    for (i = 1; i <= NUM_CUSTOMERS; i++) {
         xReturned = xTaskCreate(
                         vCustomerTask,            /* Function that implements the task. */
                         "Customer",               /* Text name for the task. */
@@ -135,7 +135,7 @@ int demoBarber( void )
     BaseType_t xReturned;
 
     /* Create the queues and semaphores. */
-    xWaitingRoomQueue = xQueueCreate(MAX_CUSTOMERS, sizeof(int));
+    xWaitingRoomQueue = xQueueCreate(NUM_SEATS, sizeof(int));
 
     if (xWaitingRoomQueue == NULL) {
         printf( "\033[93m[!]\033[0m\t\033[41mError creating waiting room queue\033[0m\n" );
@@ -179,8 +179,8 @@ int demoBarber( void )
     if (xReturned == pdPASS) {
         printf("\033[95m [*] BARBER SHOP IS NOW OPEN [*]\033[0m\n");
         printf("\033[95m     - %d  Barbers\033[0m\n", NUM_BARBERS);
-        printf("\033[95m     - %d Customers\033[0m\n", NUM_CUSTOMERS_TOTAL);
-        printf("\033[95m     - %d Seats\033[0m\n\n", MAX_CUSTOMERS);
+        printf("\033[95m     - %d Customers\033[0m\n", NUM_CUSTOMERS);
+        printf("\033[95m     - %d Seats\033[0m\n\n", NUM_SEATS);
     } else {
         printf("\033[93m[!]\033[0m\t\033[41mError creating Customer Generator task\033[0m\n");
         return 1;

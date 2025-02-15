@@ -64,7 +64,7 @@
 #define DEMO_BARBER	     4
 
 /* mainSELECT_DEMO is used to select each demo, based on the value indicated above. */
-#define mainSELECT_DEMO DEMO_BARBER
+#define mainSELECT_DEMO DEMO_SMOKERS
 
 /* printf() output uses the UART.  These constants define the addresses of the
 required UART registers. */

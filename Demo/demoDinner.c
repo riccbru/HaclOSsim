@@ -18,25 +18,26 @@ void philosopherTask(void *param) {
     int secondFork = (id % 2 == 0) ? rightFork : leftFork;
 
     while (1) {
-        printf("\033[1;90m[~]\033[0m  Philosopher %d is \033[1;90mthinking\033[0m\n", id);
         vTaskDelay(pdMS_TO_TICKS(1000));
+        
+        printf("\033[95m[ Philosopher %d ]\033[0m   is \033[1;90mthinking\033[0m\n", id + 1);
 
         // Pick up forks
         xSemaphoreTake(forks[firstFork], portMAX_DELAY);
-        printf("\033[1;91m[/]\033[0m  Philosopher %d \033[91mpicked up fork %d\033[0m\n", id, firstFork);
-
+        printf("\033[95m[ Philosopher %d ]\033[0m   picked up \033[91mfork %d\033[0m (%s)\n", id + 1, firstFork + 1, (firstFork == leftFork) ? "SX" : "DX");
+        
         xSemaphoreTake(forks[secondFork], portMAX_DELAY);
-        printf("\033[1;91m[X]\033[0m  Philosopher %d \033[91mpicked up fork %d\033[0m\n", id, secondFork);
+        printf("\033[95m[ Philosopher %d ]\033[0m   picked up \033[91mfork %d\033[0m (%s)\n", id + 1, secondFork + 1, (secondFork == leftFork) ? "SX" : "DX");
 
         // Eat
-        printf("\033[1;93m[~]\033[0m  Philosopher %d is \033[93meating\033[0m\n", id);
+        printf("\033[95m[ Philosopher %d ]\033[0m   is \033[93meating\033[0m\n", id + 1);
         vTaskDelay(pdMS_TO_TICKS(2000));
 
         // Put down forks
         xSemaphoreGive(forks[firstFork]);
         xSemaphoreGive(forks[secondFork]);
 
-        printf("\033[1;92m[*]\033[0m  Philosopher %d \033[92mfinished eating\033[0m\n\n", id);
+        printf("\033[95m[ Philosopher %d ]\033[0m   \033[92mfinished eating\033[0m & \033[92mput down forks\033[0m\n", id + 1);
     }
 }
 
