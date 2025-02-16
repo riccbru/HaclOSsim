@@ -109,12 +109,11 @@ void vBarberTask(void *pvParameters) {
 void vCustomerTask(void *pvParameters) {
     CustomerData_t *customer = (CustomerData_t *)pvParameters;
 
-    // Calculate priority: Higher priority (lower number) for earlier expiration
-    UBaseType_t priority = tskIDLE_PRIORITY + customer->expirationTime;
+    UBaseType_t minPriority = tskIDLE_PRIORITY + 1;
+    UBaseType_t maxPriority = configMAX_PRIORITIES - 1;
 
-    // Ensure priority stays within valid bounds
-    if (priority < tskIDLE_PRIORITY + 1) priority = tskIDLE_PRIORITY + 1;
-    if (priority > configMAX_PRIORITIES - 1) priority = configMAX_PRIORITIES - 1;
+    // Scale expiration time to fit within FreeRTOS priority range
+    UBaseType_t priority = minPriority + ((customer->expirationTime * (maxPriority - minPriority)) / 15); 
 
     // Set dynamic priority
     vTaskPrioritySet(NULL, priority);
