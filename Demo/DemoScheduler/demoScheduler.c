@@ -109,18 +109,17 @@ void vBarberTask(void *pvParameters) {
 void vCustomerTask(void *pvParameters) {
     CustomerData_t *customer = (CustomerData_t *)pvParameters;
 
-    // Calculate priority: Higher priority (lower number) for earlier expiration
-    UBaseType_t priority = tskIDLE_PRIORITY + customer->expirationTime;
+    UBaseType_t minPriority = tskIDLE_PRIORITY + 1;
+    UBaseType_t maxPriority = configMAX_PRIORITIES - 1;
 
-    // Ensure priority stays within valid bounds
-    if (priority < tskIDLE_PRIORITY + 1) priority = tskIDLE_PRIORITY + 1;
-    if (priority > configMAX_PRIORITIES - 1) priority = configMAX_PRIORITIES - 1;
+    // Scale expiration time to fit within FreeRTOS priority range
+    UBaseType_t priority = minPriority + ((customer->expirationTime * (maxPriority - minPriority)) / 15); 
 
     // Set dynamic priority
     vTaskPrioritySet(NULL, priority);
 
-    printf("[Customer %d] Waiting in room, Expiration: %d sec, Priority: %d\n",
-           customer->id, customer->expirationTime, priority);
+    printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[93mWaiting\033[0m in room @ \033[1;90m[%ds], \033[1;90mEXPIRATION:\033[0m %d sec, \033[1;90mPRIORITY:\033[90m %d\n",
+        customer->id, xTaskGetTickCount() / configTICK_RATE_HZ, customer->expirationTime, priority);
 
     if (uxQueueMessagesWaiting(xWaitingRoomQueue) < NUM_SEATS) {
         xQueueSendToBack(xWaitingRoomQueue, customer, 0);
