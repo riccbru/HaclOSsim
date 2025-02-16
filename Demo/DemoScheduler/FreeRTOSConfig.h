@@ -61,6 +61,7 @@
 #define configUSE_QUEUE_SETS			1
 #define configUSE_COUNTING_SEMAPHORES	1
 #define configUSE_POLLING_SERVER	    1
+#define configUSE_HAIRCUT_PREEMPTION  	1  // 1 = Allow preemption, 0 = No preemption
 
 #define configMAX_PRIORITIES			( 9UL )
 #define configQUEUE_REGISTRY_SIZE		10
@@ -96,7 +97,6 @@ to exclude the API function. */
 #define INCLUDE_xTaskGetHandle					1
 #define INCLUDE_xTaskCreateAperiodic			1
 #define INCLUDE_xTaskCreatePeriodic			    1
-#define configALLOW_MID_HAIRCUT_PREEMPTION  	1  // 1 = Allow preemption, 0 = No preemption
 
 
 /* This demo makes use of one or more example stats formatting functions.  These

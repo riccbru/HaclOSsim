@@ -65,7 +65,7 @@ void vBarberTask(void *pvParameters) {
                 if (nextCustomer.expirationTime < currentCustomer.expirationTime) {
                     
                     // **Conditional Preemption** based on config flag
-                    #if configALLOW_MID_HAIRCUT_PREEMPTION
+                    #if configUSE_HAIRCUT_PREEMPTION
                         printf("[Barber] Preempting customer %d for customer %d at %d seconds\n", 
                                 currentCustomer.id, nextCustomer.id, xTaskGetTickCount() / configTICK_RATE_HZ);
 
