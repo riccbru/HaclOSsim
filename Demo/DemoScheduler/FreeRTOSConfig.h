@@ -44,7 +44,7 @@
 
 #define configUSE_TICKLESS_IDLE         0
 #define configUSE_PREEMPTION			1
-#define configUSE_APERIODIC_PREEMPTION	0
+#define configUSE_APERIODIC_PREEMPTION	1
 #define configUSE_IDLE_HOOK				0
 #define configUSE_TICK_HOOK				1
 #define configCPU_CLOCK_HZ				( ( unsigned long ) 25000000 )
@@ -96,6 +96,8 @@ to exclude the API function. */
 #define INCLUDE_xTaskGetHandle					1
 #define INCLUDE_xTaskCreateAperiodic			1
 #define INCLUDE_xTaskCreatePeriodic			    1
+#define configALLOW_MID_HAIRCUT_PREEMPTION  	1  // 1 = Allow preemption, 0 = No preemption
+
 
 /* This demo makes use of one or more example stats formatting functions.  These
 format the raw data provided by the uxTaskGetSystemState() function in to human
