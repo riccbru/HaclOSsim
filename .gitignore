@@ -4,3 +4,4 @@
 *.map
 !output\.gitkeep
 RTOSDemo.map
+.DS_Store
