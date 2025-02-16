@@ -21,7 +21,7 @@ typedef struct {
 QueueHandle_t xWaitingRoomQueue;
 SemaphoreHandle_t xBarberChair;
 TaskHandle_t xSchedulerTaskHandle;
-int servedCustomers = 0, lostCustomers = 0;
+int servedCustomers = 0, lostCustomers = 0, preemptedCustomers = 0;
 
 CustomerData_t customers[NUM_CUSTOMERS] = {
     {1, 1, 10, 2},
@@ -44,13 +44,13 @@ void vBarberTask(void *pvParameters) {
                 
                 // **Check if the customer's deadline has already expired**
                 if (currentTime >= (currentCustomer.expirationTime * configTICK_RATE_HZ)) {
-                    printf("[Barber] Customer %d left: Expired at %d seconds\n",
+                    printf("\033[95m[ CUSTOMER %d ]\033[0m\tLeft: \033[91mEXPIRED\033[0m @ \033[1;90m[%ds] \033[0m\n",
                            currentCustomer.id, currentTime / configTICK_RATE_HZ);
                     lostCustomers++;
                     continue; // Skip to the next customer
                 }
 
-                printf("[Barber] Starting haircut for customer %d at %d seconds\n", 
+                printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[92mStarting\033[0m haircut @ \033[1;90m[%ds] \033[0m\n", 
                         currentCustomer.id, currentTime / configTICK_RATE_HZ);
                 remainingTime = currentCustomer.serviceTime * configTICK_RATE_HZ;
                 barberBusy = 1;
@@ -66,8 +66,9 @@ void vBarberTask(void *pvParameters) {
                     
                     // **Conditional Preemption** based on config flag
                     #if configUSE_HAIRCUT_PREEMPTION
-                        printf("[Barber] Preempting customer %d for customer %d at %d seconds\n", 
-                                currentCustomer.id, nextCustomer.id, xTaskGetTickCount() / configTICK_RATE_HZ);
+                        printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[1;93mPreempted\033[0m customer %d @ \033[1;90m[%ds] \033[0m\n", 
+                                nextCustomer.id, currentCustomer.id, xTaskGetTickCount() / configTICK_RATE_HZ);
+                        preemptedCustomers++;
 
                         // Put the unfinished customer back in the queue
                         xQueueSendToBack(xWaitingRoomQueue, &currentCustomer, 0);
@@ -82,7 +83,7 @@ void vBarberTask(void *pvParameters) {
 
             // **Check during the haircut if the deadline has expired**
             if (xTaskGetTickCount() >= (currentCustomer.expirationTime * configTICK_RATE_HZ)) {
-                printf("[Barber] Customer %d left mid-haircut: Expired at %d seconds\n",
+                printf("\033[95m [  BARBER  ]\033[0m\t\033[91mCustomer \033[1m%d\033[0m left\033[0m mid-haircut: \033[91mEXPIRED\033[0 @ \033[1;90m[%ds] \033[0m\n",
                        currentCustomer.id, xTaskGetTickCount() / configTICK_RATE_HZ);
                 lostCustomers++;
                 barberBusy = 0;
@@ -94,7 +95,7 @@ void vBarberTask(void *pvParameters) {
             remainingTime -= configTICK_RATE_HZ;
 
             if (remainingTime <= 0) {
-                printf("[Barber] Finished haircut for customer %d at %d seconds\n", 
+                printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[1;42mFinished\033[0m haircut @ \033[1;90m[%ds] \033[0m\n", 
                         currentCustomer.id, xTaskGetTickCount() / configTICK_RATE_HZ);
                 servedCustomers++;
                 barberBusy = 0;
@@ -104,10 +105,6 @@ void vBarberTask(void *pvParameters) {
         vTaskDelay(pdMS_TO_TICKS(50)); // Prevent CPU overuse
     }
 }
-
-
-
-
 
 void vCustomerTask(void *pvParameters) {
     CustomerData_t *customer = (CustomerData_t *)pvParameters;
@@ -122,8 +119,8 @@ void vCustomerTask(void *pvParameters) {
     // Set dynamic priority
     vTaskPrioritySet(NULL, priority);
 
-    printf("[Customer %d] Waiting in room, Expiration: %d sec, Priority: %d\n",
-           customer->id, customer->expirationTime, priority);
+    printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[93mWaiting\033[0m in room @ \033[1;90m[%ds], \033[1;90mEXPIRATION:\033[0m %d sec, \033[1;90mPRIORITY:\033[90m %d\n",
+        customer->id, xTaskGetTickCount() / configTICK_RATE_HZ, customer->expirationTime, priority);
 
     if (uxQueueMessagesWaiting(xWaitingRoomQueue) < NUM_SEATS) {
         xQueueSendToBack(xWaitingRoomQueue, customer, 0);
@@ -131,18 +128,12 @@ void vCustomerTask(void *pvParameters) {
         // Force a reschedule to allow higher-priority tasks to take over
         taskYIELD();
     } else {
-        printf("[Customer %d] Left: No seats available\n", customer->id);
+        printf("\033[95m[ CUSTOMER %d ]\033[0m\tLeft: \033[91mNo seats available\033[91m\n", customer->id);
         lostCustomers++;
     }
 
     vTaskDelete(NULL);
 }
-
-
-
-
-
-
 
 void vCustomerGeneratorCallback(TimerHandle_t xTimer) {
     int customerIndex = (int)pvTimerGetTimerID(xTimer);
@@ -151,6 +142,7 @@ void vCustomerGeneratorCallback(TimerHandle_t xTimer) {
 }
 
 void vCustomerGeneratorTask(void *pvParameters) {
+    ( void ) pvParameters;
     // Sort customers first by arrival time, then by expiration time (EDF)
     for (int i = 0; i < NUM_CUSTOMERS - 1; i++) {
         for (int j = i + 1; j < NUM_CUSTOMERS; j++) {
@@ -171,17 +163,17 @@ void vCustomerGeneratorTask(void *pvParameters) {
     vTaskDelete(NULL);
 }
 
-
-
 void vEndStatistics(void *pvParameters) {
     ( void ) pvParameters;
     while (servedCustomers + lostCustomers < NUM_CUSTOMERS) {
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
-    printf("--- Barber Shop Closed ---\n");
-    printf("Total Customers: %d\n", NUM_CUSTOMERS);
-    printf("Served Customers: %d\n", servedCustomers);
-    printf("Lost Customers: %d\n", lostCustomers);
+    printf("\n");
+    printf("\t\033[1;45m[*] BARBER SCHEDULER DATA [*]\033[0m\n");
+    printf("TOTAL Customers:\t\033[1m%d\033[0m\n", NUM_CUSTOMERS);
+    printf("\033[93mPREEMPTED Customers\033[0m  \t\033[1;93m%d\033[0m   \033[1;90m(PREEMPTION:\033[0m %d\033[1;90m)\033[0m\n", preemptedCustomers, configUSE_HAIRCUT_PREEMPTION);
+    printf("\033[91mLOST Customers\033[0m  \t\033[1;91m%d\033[0m\n", lostCustomers);
+    printf("\033[92mSERVED Customers\033[0m\t\033[1;92m%d\033[0m\n", servedCustomers);
     vTaskEndScheduler();
 }
 
@@ -194,6 +186,22 @@ int main_scheduler(void) {
     xTaskCreate(vCustomerGeneratorTask, "CustomerGen", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(vEndStatistics, "EndStats", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
 
+    printf("\t\033[1;45m[*] BARBER SCHEDULER [*]\033[0m\n");
+    printf("  \033[95mSEATS     = \033[1m%d\033[0m\033[0m\n", NUM_SEATS);
+    printf("  \033[95mCUSTOMERS = \033[1m%d\033[0m\033[0m\n", NUM_CUSTOMERS);
+    printf("  \033[95mHAIRCUT PREEMPTION \033[1m%d\033[0m\033[0m\n", configUSE_HAIRCUT_PREEMPTION);
+    printf("  \033[95mCUSTOMERS DATA:\033[0m\n");
+    printf("  +----+--------------+-----------------+--------------+\n");
+    printf("  | ID | Arrival Time | Expiration Time | Service Time |\n");
+    printf("  |    |              |    (PRIORITY)   |              |\n");
+    printf("  +----+--------------+-----------------+--------------+\n");
+    for (int i = 0; i < NUM_CUSTOMERS; i++) {
+        printf("  | %-2d | %-12d | %-15d | %-12d |\n",
+            customers[i].id, customers[i].arrivalTime, customers[i].expirationTime, customers[i].serviceTime);
+        }
+    printf("  +----+--------------+-----------------+--------------+\n");
+    printf("\t\033[1;45m[*] BARBER SHOP IS OPEN [*]\033[0m\n\n");
+    
     vTaskStartScheduler();
     return 0;
 }
