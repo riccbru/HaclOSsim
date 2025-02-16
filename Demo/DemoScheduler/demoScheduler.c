@@ -21,7 +21,7 @@ typedef struct {
 QueueHandle_t xWaitingRoomQueue;
 SemaphoreHandle_t xBarberChair;
 TaskHandle_t xSchedulerTaskHandle;
-int servedCustomers = 0, lostCustomers = 0, preemptedCustomers = 0, preemptedCustomers = 0;
+int servedCustomers = 0, lostCustomers = 0, preemptedCustomers = 0;
 
 CustomerData_t customers[NUM_CUSTOMERS] = {
     {1, 1, 10, 2},
@@ -118,7 +118,7 @@ void vCustomerTask(void *pvParameters) {
     // Set dynamic priority
     vTaskPrioritySet(NULL, priority);
 
-    printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[93mWaiting\033[0m in room @ \033[1;90m[%ds], \033[1;90mEXPIRATION:\033[0m %d sec, \033[1;90mPRIORITY:\033[90m %d\n",
+    printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[93mWaiting\033[0m in room  @ \033[1;90m[%ds], \033[1;90mEXPIRATION:\033[0m %d sec, \033[1;90mPRIORITY:\033[90m %d\n",
         customer->id, xTaskGetTickCount() / configTICK_RATE_HZ, customer->expirationTime, priority);
 
     if (uxQueueMessagesWaiting(xWaitingRoomQueue) < NUM_SEATS) {
