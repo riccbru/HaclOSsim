@@ -125,7 +125,7 @@ void vCustomerTask(void *pvParameters) {
     if (uxQueueMessagesWaiting(xWaitingRoomQueue) < NUM_SEATS) {
         xQueueSendToBack(xWaitingRoomQueue, customer, 0);
 
-        // Force a reschedule to allow higher-priority tasks to take over
+        // Force a reschedule to allow higher-priority tasks to take over.
         taskYIELD();
     } else {
         printf("\033[95m[ CUSTOMER %d ]\033[0m\tLeft: \033[91mNo seats available\033[91m\n", customer->id);
