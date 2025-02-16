@@ -118,13 +118,13 @@ void vCustomerTask(void *pvParameters) {
     // Set dynamic priority
     vTaskPrioritySet(NULL, priority);
 
-    printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[93mWaiting\033[0m in room, \033[1;90mEXPIRATION:\033[0m %d sec, \033[1;90mPRIORITY:\033[90m %d\n",
-           customer->id, customer->expirationTime, priority);
+    printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[93mWaiting\033[0m in room @ \033[1;90m[%ds], \033[1;90mEXPIRATION:\033[0m %d sec, \033[1;90mPRIORITY:\033[90m %d\n",
+        customer->id, xTaskGetTickCount() / configTICK_RATE_HZ, customer->expirationTime, priority);
 
     if (uxQueueMessagesWaiting(xWaitingRoomQueue) < NUM_SEATS) {
         xQueueSendToBack(xWaitingRoomQueue, customer, 0);
 
-        // Force a reschedule to allow higher-priority tasks to take over
+        // Force a reschedule to allow higher-priority tasks to take over.
         taskYIELD();
     } else {
         printf("\033[95m[ CUSTOMER %d ]\033[0m\tLeft: \033[91mNo seats available\033[91m\n", customer->id);
