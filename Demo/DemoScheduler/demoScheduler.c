@@ -56,7 +56,7 @@ void vBarberTask(void *pvParameters) {
                     currentCustomer.remainingTime = currentCustomer.serviceTime * configTICK_RATE_HZ;
                 }
 
-                printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[92mCutting\033[0m hair     @ \033[1;90m[%ds] \033[0m\n", 
+                printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[92mCutting\033[0m hair         @ \033[1;90m[%ds] \033[0m\n", 
                         currentCustomer.id, currentTime / configTICK_RATE_HZ);
                 barberBusy = 1;
             }
@@ -103,7 +103,7 @@ void vBarberTask(void *pvParameters) {
             currentCustomer.remainingTime -= configTICK_RATE_HZ;
 
             if (currentCustomer.remainingTime <= 0) {
-                printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[1;42mFinished\033[0m haircut @ \033[1;90m[%ds] \033[0m\n", 
+                printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[1;42mFinished\033[0m haircut     @ \033[1;90m[%ds] \033[0m\n", 
                         currentCustomer.id, xTaskGetTickCount() / configTICK_RATE_HZ);
                 servedCustomers++;
                 barberBusy = 0;
@@ -113,7 +113,6 @@ void vBarberTask(void *pvParameters) {
         vTaskDelay(pdMS_TO_TICKS(50)); // Prevent CPU overuse
     }
 }
-
 
 void vCustomerTask(void *pvParameters) {
     CustomerData_t *customer = (CustomerData_t *)pvParameters;
@@ -127,7 +126,7 @@ void vCustomerTask(void *pvParameters) {
     // Set dynamic priority
     vTaskPrioritySet(NULL, priority);
 
-    printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[93mWaiting\033[0m in room  @ \033[1;90m[%ds], \033[1;90mEXPIRATION:\033[0m %d sec, \033[1;90mPRIORITY:\033[90m %d\n",
+    printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[93mWaiting\033[0m in room      @ \033[1;90m[%ds], \033[1;90mEXPIRATION:\033[0m %d sec, \033[1;90mPRIORITY:\033[90m %d\n",
         customer->id, xTaskGetTickCount() / configTICK_RATE_HZ, customer->expirationTime, priority);
 
     if (uxQueueMessagesWaiting(xWaitingRoomQueue) < NUM_SEATS) {
