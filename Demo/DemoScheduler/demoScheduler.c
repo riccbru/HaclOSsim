@@ -12,11 +12,13 @@
 
 /* Customer data structure */
 typedef struct {
-    int id;         // Customer ID
-    int arrivalTime;
-    int expirationTime; // Time after which the customer leaves if not served
-    int serviceTime; // Hair cut duration
+    int id;                  // Customer ID
+    int arrivalTime;         // Time when the customer arrived
+    int expirationTime;      // Time after which the customer leaves
+    int serviceTime;         // Haircut duration
+    int remainingTime;       // Remaining time when preempted
 } CustomerData_t;
+
 
 QueueHandle_t xWaitingRoomQueue;
 SemaphoreHandle_t xBarberChair;
@@ -24,16 +26,15 @@ TaskHandle_t xSchedulerTaskHandle;
 int servedCustomers = 0, lostCustomers = 0, preemptedCustomers = 0;
 
 CustomerData_t customers[NUM_CUSTOMERS] = {
-    {1, 1, 10, 2},
-    {2, 3, 8, 5},
-    {3, 5, 12, 1},
-    {4, 1, 7, 1},
-    {5, 4, 15, 2},
+    {1, 1, 10, 2, 0},
+    {2, 3, 8, 5, 0},
+    {3, 5, 12, 1, 0},
+    {4, 1, 7, 1, 0},
+    {5, 4, 15, 2, 0},
 };
 
 void vBarberTask(void *pvParameters) {
     CustomerData_t currentCustomer;
-    int remainingTime = 0;
     int barberBusy = 0; // Flag to track if the barber is cutting hair
 
     for (;;) {
@@ -50,9 +51,13 @@ void vBarberTask(void *pvParameters) {
                     continue; // Skip to the next customer
                 }
 
-                printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[92mStarting\033[0m haircut @ \033[1;90m[%ds] \033[0m\n", 
+                // **If this customer was preempted before, resume from remaining time**
+                if (currentCustomer.remainingTime == 0) {
+                    currentCustomer.remainingTime = currentCustomer.serviceTime * configTICK_RATE_HZ;
+                }
+
+                printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[92mCutting\033[0m hair     @ \033[1;90m[%ds] \033[0m\n", 
                         currentCustomer.id, currentTime / configTICK_RATE_HZ);
-                remainingTime = currentCustomer.serviceTime * configTICK_RATE_HZ;
                 barberBusy = 1;
             }
         }
@@ -69,6 +74,9 @@ void vBarberTask(void *pvParameters) {
                         printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[1;93mPreempted\033[0m customer %d @ \033[1;90m[%ds] \033[0m\n", 
                                 nextCustomer.id, currentCustomer.id, xTaskGetTickCount() / configTICK_RATE_HZ);
                         preemptedCustomers++;
+
+                        // Store remaining time before preempting
+                        currentCustomer.remainingTime -= (xTaskGetTickCount() - (currentCustomer.serviceTime * configTICK_RATE_HZ - currentCustomer.remainingTime));
 
                         // Put the unfinished customer back in the queue
                         xQueueSendToBack(xWaitingRoomQueue, &currentCustomer, 0);
@@ -90,11 +98,11 @@ void vBarberTask(void *pvParameters) {
                 continue; // Move on to the next customer
             }
 
-            // Continue haircut
+            // **Continue haircut for remaining time**
             vTaskDelay(pdMS_TO_TICKS(1000)); // Simulate 1 second of cutting
-            remainingTime -= configTICK_RATE_HZ;
+            currentCustomer.remainingTime -= configTICK_RATE_HZ;
 
-            if (remainingTime <= 0) {
+            if (currentCustomer.remainingTime <= 0) {
                 printf("\033[95m[ CUSTOMER %d ]\033[0m\t\033[1;42mFinished\033[0m haircut @ \033[1;90m[%ds] \033[0m\n", 
                         currentCustomer.id, xTaskGetTickCount() / configTICK_RATE_HZ);
                 servedCustomers++;
@@ -105,6 +113,7 @@ void vBarberTask(void *pvParameters) {
         vTaskDelay(pdMS_TO_TICKS(50)); // Prevent CPU overuse
     }
 }
+
 
 void vCustomerTask(void *pvParameters) {
     CustomerData_t *customer = (CustomerData_t *)pvParameters;

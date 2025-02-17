@@ -60,7 +60,7 @@
 #define configUSE_MALLOC_FAILED_HOOK	1
 #define configUSE_QUEUE_SETS			1
 #define configUSE_COUNTING_SEMAPHORES	1
-#define configUSE_HAIRCUT_PREEMPTION  	0  // 1 = Allow preemption, 0 = No preemption
+#define configUSE_HAIRCUT_PREEMPTION  	1  // 1 = Allow preemption, 0 = No preemption
 
 #define configMAX_PRIORITIES			( 9UL )
 #define configQUEUE_REGISTRY_SIZE		10
